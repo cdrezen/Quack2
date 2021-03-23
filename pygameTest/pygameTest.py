@@ -1,6 +1,5 @@
 import pygame
 import math
-import os
 
 running = True
 timer = pygame.time.Clock()
@@ -39,8 +38,6 @@ def draw():
 
     pygame.display.update()
 
-
-print(os.getcwd())
 
 pygame.init()
 pygame.display.set_caption("QUACK 2.0")
