@@ -27,6 +27,8 @@ def draw():
 
 pygame.init()
 pygame.display.set_caption("JEU BIEN")
+screen = pygame.display.set_mode(dimentions)
+
 
 background = Acteur([pygame.image.load("background0.png"), pygame.image.load("background1.png")], 2)
 quack = Acteur([pygame.image.load("quack0.png"), pygame.image.load("quack1.png")], 2, (dimentions[0] / 2, dimentions[1] / 2))

@@ -4,13 +4,15 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>783c0389-cea5-4296-ba04-17e471e58171</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>pygameTest.py</StartupFile>
+    <StartupFile>
+    </StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>pygameTest</Name>
     <RootNamespace>pygameTest</RootNamespace>
+    <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,6 +23,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="partagecode.py" />
     <Compile Include="pygameTest ancien.py" />
     <Compile Include="pygameTest.py" />
   </ItemGroup>
