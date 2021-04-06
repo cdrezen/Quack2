@@ -7,7 +7,7 @@ dimentions = (1024, 720)
 fps = 16
 iFrames = 0
 mousePos = [0,0]
-
+#def 
 class Acteur:
     def __init__(self, animation, framesCount, position = (0,0), angle = 0):
         self.animation = animation
@@ -21,17 +21,17 @@ def draw():
     quackFrame = quack.animation[int(iFrames / (fps / quack.framesCount))]
     
     
-    #rel_x, rel_y = mousePos[0] - quack.position[0], mousePos[1] - quack.position[1]
+    rel_x, rel_y = mousePos[0] - quack.position[0], mousePos[1] - quack.position[1]
 
-    #if(abs(rel_x) > 4 or abs(rel_y) > 4):##sensibilité de 4px
+    if(abs(rel_x) > 4 or abs(rel_y) > 4):##sensibilité de 4px
 
-    #    quack.angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
-    #    print(quack.angle)###
-    #    quack.position = (mousePos[0], mousePos[1])
+        quack.angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+        #print(quack.angle)###
+        quack.position = (mousePos[0], mousePos[1])
 
 
-    #quackFrame = pygame.transform.rotate(quackFrame, int(quack.angle - 90))     
-    #rect = quackFrame.get_rect(center=quack.position)  
+    quackFrame = pygame.transform.rotate(quackFrame, int(quack.angle - 90))     
+    rect = quackFrame.get_rect(center=quack.position)  
     
     #print(rect)###
 
@@ -63,10 +63,3 @@ while running:
     draw()
     iFrames += 1
     if (iFrames >= fps): iFrames = 0
-
-
-
-
-class 
-
-
