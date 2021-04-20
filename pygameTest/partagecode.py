@@ -12,13 +12,24 @@ X,Y = 0,1
 
 #personnage joueur
 class Nafaire:
-    def __init__(self, position=[0,0], animation=[], vie=0, dmg=1, vitesse=1, rect=None):
+    def __init__(self, position=[0,0], animation=None, vie=0, dmg=1, vitesse=25, vitesseY=25, rect=None):
         self.position = position
         self.animation = animation
         self.vie = vie
         self.dmg = dmg   
         self.vitesse = vitesse
-        self.rect = rect
+        self.vitesseY = vitesseY
+        
+        if(animation == None): return
+        
+        self.rect = self.animation[0].get_rect(center=self.position)
+
+    def deplacement(self, x, y):
+        self.position[X] += x * self.vitesse
+        self.position[Y] += y * self.vitesseY
+        self.animation[0].get_rect(center=self.position)
+
+
 #affichage contiens ce qui doit etre affiché grace a pygame il es tutiliser a la fin du mainloop pour raffraichir l'affichage  
 def Affichage():
 
@@ -74,13 +85,13 @@ while leJeuTourne:
     #key_pressed: 
     if(keysDown != None):
         if keysDown[pygame.K_z]:             
-            Joueur.position[Y] -= 1 * Joueur.vitesse
+            Joueur.deplacement(0, -1)
         if keysDown[pygame.K_s]:
-            Joueur.position[Y] += 1 * Joueur.vitesse
+            Joueur.deplacement(0, 1)
         if keysDown[pygame.K_q]:
-            Joueur.position[X] -= 1 * Joueur.vitesse
+            Joueur.deplacement(-1, 0)
         if keysDown[pygame.K_d]:                
-            Joueur.position[X] += 1 * Joueur.vitesse
+            Joueur.deplacement(1, 0)
 
         #corrige la position du joueur pour qu'il ne sorte pas du cadre
         if Joueur.position[X] < 0 : Joueur.position[X] = 0
@@ -91,8 +102,6 @@ while leJeuTourne:
         Joueur.rect = Joueur.animation[0].get_rect(center=Joueur.position)
 
     ennemi.position[Y] += 1 * ennemi.vitesse
-    ennemi.rect = ennemi.animation[0].get_rect(center=ennemi.position)
-
     ###
 
     Affichage()
