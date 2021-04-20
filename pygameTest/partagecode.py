@@ -5,15 +5,12 @@ Score = 0
 dimentions = (1024, 720)
 Fenêtre = None
 timer = pygame.time.Clock()
-#bonus time = 50
-
-
-X,Y = 0,1
+#bonusTime = 50
 
 #personnage joueur
 class Nafaire:
-    def __init__(self, position=[0,0], animation=None, vie=0, dmg=1, vitesse=25, vitesseY=25, rect=None):
-        self.position = position
+    def __init__(self, position=(0,0), animation=None, vie=0, dmg=1, vitesse=25, vitesseY=25, rect=None):
+        self.x , self.y = position
         self.animation = animation
         self.vie = vie
         self.dmg = dmg   
@@ -22,18 +19,17 @@ class Nafaire:
         
         if(animation == None): return
         
-        self.rect = self.animation[0].get_rect(center=self.position)
+        self.rect = self.animation[0].get_rect(center=(self.x, self.y))
 
     def deplacement(self, x, y):
-        self.position[X] += x * self.vitesse
-        self.position[Y] += y * self.vitesseY
-        self.animation[0].get_rect(center=self.position)
-
+        self.x += x * self.vitesse
+        self.y += y * self.vitesseY
+        self.rect = self.animation[0].get_rect(center=(self.x, self.y))
 
 #affichage contiens ce qui doit etre affiché grace a pygame il es tutiliser a la fin du mainloop pour raffraichir l'affichage  
 def Affichage():
 
-    Fenêtre.blit(arrièrePlan.animation[0], arrièrePlan.position)
+    Fenêtre.blit(arrièrePlan.animation[0], (arrièrePlan.x, arrièrePlan.y))
     Fenêtre.blit(Joueur.animation[0], Joueur.rect) #dessine le personnage à l'écran
     Fenêtre.blit(ennemi.animation[0], ennemi.rect)
     pygame.display.update()
@@ -50,11 +46,9 @@ Fenêtre = pygame.display.set_mode(dimentions) # crée la fenêtre et enregiste 
 arrièrePlan = Nafaire([0,0], [pygame.image.load("background0.png")])
 arrièrePlan.animation[0] = pygame.transform.scale(arrièrePlan.animation[0], dimentions)
 
-Joueur = Nafaire([dimentions[X] / 2, dimentions[Y] / 2], [pygame.image.load("quack0.png")])
-Joueur.rect = Joueur.animation[0].get_rect(center=Joueur.position)
+Joueur = Nafaire([dimentions[0] / 2, dimentions[1] / 2], [pygame.image.load("quack0.png")])
 
-ennemi = Nafaire([dimentions[X] / 2, 5 ], [pygame.image.load("heart.png")])   #cree un ennemi
-ennemi.rect = ennemi.animation[0].get_rect(center=ennemi.position)
+ennemi = Nafaire([dimentions[0] / 2, 5 ], [pygame.image.load("heart.png")])   #cree un ennemi
 
 balle = Nafaire()
 bonus = Nafaire(dmg=0, vitesse=0)
@@ -94,14 +88,14 @@ while leJeuTourne:
             Joueur.deplacement(1, 0)
 
         #corrige la position du joueur pour qu'il ne sorte pas du cadre
-        if Joueur.position[X] < 0 : Joueur.position[X] = 0
-        if Joueur.position[X] > dimentions[X] : Joueur.position[X] = dimentions[X]
-        if Joueur.position[Y] < 0 : Joueur.position[Y] = 0
-        if Joueur.position[Y] > dimentions[Y] : Joueur.position[Y] = dimentions[Y]
+        if Joueur.x < 0 : Joueur.x = 0
+        if Joueur.x > dimentions[0] : Joueur.x = dimentions[0]
+        if Joueur.y < 0 : Joueur.y = 0
+        if Joueur.y > dimentions[1] : Joueur.y = dimentions[1]
 
-        Joueur.rect = Joueur.animation[0].get_rect(center=Joueur.position)
+        Joueur.rect = Joueur.animation[0].get_rect(center=(Joueur.x, Joueur.y))
 
-    ennemi.position[Y] += 1 * ennemi.vitesse
+    ennemi.deplacement(0, 1)
     ###
 
     Affichage()
