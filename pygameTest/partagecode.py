@@ -32,11 +32,16 @@ def Affichage():
     Fenêtre.blit(arrièrePlan.animation[0], (arrièrePlan.x, arrièrePlan.y))
     Fenêtre.blit(Joueur.animation[0], Joueur.rect) #dessine le personnage à l'écran
     Fenêtre.blit(ennemi.animation[0], ennemi.rect)
+
+    for b in balleList:
+        Fenêtre.blit(b.animation[0], b.rect)
+
     pygame.display.update()
  
 
 def tire():
-    return 0
+    balle = Nafaire([Joueur.x, Joueur.y], balleImg)
+    balleList.append(balle)
 
 #DEBUT DU PROGRAMME
 pygame.init()   #initialisation de pygame
@@ -50,7 +55,8 @@ Joueur = Nafaire([dimentions[0] / 2, dimentions[1] / 2], [pygame.image.load("qua
 
 ennemi = Nafaire([dimentions[0] / 2, 5 ], [pygame.image.load("heart.png")])   #cree un ennemi
 
-balle = Nafaire()
+balleImg = [pygame.image.load("heart.png")]
+balleList = list()
 bonus = Nafaire(dmg=0, vitesse=0)
     
 
@@ -86,6 +92,8 @@ while leJeuTourne:
             Joueur.deplacement(-1, 0)
         if keysDown[pygame.K_d]:                
             Joueur.deplacement(1, 0)
+        if keysDown[pygame.K_SPACE]:
+            tire()
 
         #corrige la position du joueur pour qu'il ne sorte pas du cadre
         if Joueur.x < 0 : Joueur.x = 0
@@ -96,6 +104,9 @@ while leJeuTourne:
         Joueur.rect = Joueur.animation[0].get_rect(center=(Joueur.x, Joueur.y))
 
     ennemi.deplacement(0, 1)
+
+    for b in balleList:
+        b.deplacement(0, -1)
     ###
 
     Affichage()
