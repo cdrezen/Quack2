@@ -55,10 +55,12 @@ class Nafaire:
                 for enemi in enemies:
                    if self.rect.colliderect(enemi.rect): 
                        self.x, self.y = self.anciennePos
+                       self.rect = self.animation[0].get_rect(center=(self.x, self.y))
                        pygame.event.post(pygame.event.Event(COLLISION_EVENT, source=self, collision=enemi))
             else:#NafaireTypes.ENNEMI
                 if self.rect.colliderect(Joueur.rect): 
                     self.x, self.y = self.anciennePos
+                    self.rect = self.animation[0].get_rect(center=(self.x, self.y))
                     pygame.event.post(pygame.event.Event(COLLISION_EVENT, source=self, collision=Joueur))
 
 
