@@ -138,8 +138,8 @@ while leJeuTourne:
 
         if event.type == COLLISION_EVENT:
             print("COLLISION")
-            #if(event.source.type == NafaireTypes.BALLE):
-            #    enemies.remove(event.collision);
+            if(event.source.type == NafaireTypes.BALLE):
+                enemies.remove(event.collision);
             #if(event.source.type == NafaireTypes.JOUEUR and event.collision.type == NafaireTypes.ENNEMI):
             #    Joueur.x, Joueur.y = Joueur.anciennePos
             #    event.collision.x, event.collision.y = event.collision.anciennePos
