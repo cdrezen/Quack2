@@ -5,7 +5,7 @@ Score = 0
 dimentions = (1024, 720)
 Fenêtre = None
 timer = pygame.time.Clock()
-#bonusTime = 50
+#bonusTime = 51
 
 #personnage joueur
 class Nafaire:
