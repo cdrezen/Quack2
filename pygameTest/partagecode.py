@@ -4,10 +4,15 @@ from enum import Enum
 leJeuTourne = True
 Score = 0
 dimentions = (1024, 720)
+fps = 60
+tireParSecondes = 4
+peutTirer = True
+
+AFFICHAGE_TIMER_EVENT = pygame.USEREVENT + 0
+COLLISION_EVENT = pygame.USEREVENT + 1
+DELAY_TIRE_EVENT = pygame.USEREVENT + 2
+
 Fenêtre = None
-timer = pygame.time.Clock()
-#bonusTime = 50
-COLLISION_EVENT = pygame.USEREVENT + 0
 
 class NafaireTypes(Enum):
     DEFAULT = 0
@@ -19,7 +24,7 @@ class NafaireTypes(Enum):
 
 #personnage joueur
 class Nafaire:
-    def __init__(self, position=(0,0), animation=None, vie=0, dmg=1, vitesseX=25, vitesseY=25, rect=None, type=NafaireTypes.DEFAULT, colisionBordure=False):
+    def __init__(self, position=(0,0), animation=None, vie=0, dmg=1, vitesseX=0.05, vitesseY=0.05, rect=None, type=NafaireTypes.DEFAULT):
         self.x , self.y = position
         self.anciennePos = position
         self.animation = animation
@@ -28,7 +33,6 @@ class Nafaire:
         self.vitesseX = vitesseX
         self.vitesseY = vitesseY
         self.type = type
-        self.colisionBordure = colisionBordure
         
         if(animation == None): return
         
@@ -97,8 +101,13 @@ def Affichage():
  
 
 def tire():
-    balle = Nafaire([Joueur.rect.centerx + 4, Joueur.rect.top + 22], balleImg, type=NafaireTypes.BALLE)
+    global peutTirer
+    peutTirer = False
+    balle = Nafaire([Joueur.rect.centerx + 4, Joueur.rect.top + 22], balleImg, type=NafaireTypes.BALLE, vitesseY=0.06)
     balleList.append(balle)
+
+    pygame.time.set_timer(DELAY_TIRE_EVENT, int(1000/tireParSecondes), True)
+
 
 #DEBUT DU PROGRAMME
 pygame.init()   #initialisation de pygame
@@ -108,7 +117,7 @@ Fenêtre = pygame.display.set_mode(dimentions) # crée la fenêtre et enregiste 
 arrièrePlan = Nafaire([0,0], [pygame.image.load("background0.png")])
 arrièrePlan.animation[0] = pygame.transform.scale(arrièrePlan.animation[0], dimentions)
 
-Joueur = Nafaire([dimentions[0] / 2, dimentions[1] / 2], [pygame.image.load("quack0.png")], type=NafaireTypes.JOUEUR, colisionBordure=True)
+Joueur = Nafaire([dimentions[0] / 2, dimentions[1] / 2], [pygame.image.load("quack0.png")], type=NafaireTypes.JOUEUR)
 
 enemies = list()
 enemies.append(Nafaire([dimentions[0] / 2, 5 ], [pygame.image.load("heart.png")], type=NafaireTypes.ENNEMI))   #cree un ennemi
@@ -117,29 +126,32 @@ balleImg = [pygame.image.load("balleJoueur.png")]
 balleList = list()
 bonus = Nafaire(dmg=0, vitesseX=0)
     
-
+pygame.time.set_timer(AFFICHAGE_TIMER_EVENT, int(1000/fps))
 
 LEFT_CLICK = 1
 keysDown = None
 
 while leJeuTourne:
-
-    timer.tick(1000/60)
-
     ###gestion des evenements:
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:# Change la valeur à False pour terminer le while
-            running = False
+            leJeuTourne = False
+
+        if event.type == AFFICHAGE_TIMER_EVENT:
+            Affichage()
+
+        if event.type == DELAY_TIRE_EVENT:
+            peutTirer = True
 
         if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
             keysDown = pygame.key.get_pressed()
         
         if event.type == pygame.MOUSEBUTTONUP: #tire quand on clique avec la souris
-            if event.button == LEFT_CLICK: tire()
+            if (event.button == LEFT_CLICK and peutTirer == True): 
+                tire()
 
         if event.type == COLLISION_EVENT:
-            print("COLLISION")
             if(event.source.type == NafaireTypes.BALLE):
                 enemies.remove(event.collision);
             #if(event.source.type == NafaireTypes.JOUEUR and event.collision.type == NafaireTypes.ENNEMI):
@@ -165,7 +177,8 @@ while leJeuTourne:
             Joueur.deplacement(-1, 0)
         if keysDown[pygame.K_d]:                
             Joueur.deplacement(1, 0)
-        if keysDown[pygame.K_SPACE]:
+        if (keysDown[pygame.K_SPACE] and peutTirer == True):
+            print(peutTirer)
             tire()
 
     if(len(enemies) != 0): 
@@ -174,8 +187,6 @@ while leJeuTourne:
     for b in balleList:
         b.deplacement(0, -1)
     ###
-
-    Affichage()
 
 
 
