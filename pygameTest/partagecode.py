@@ -44,42 +44,32 @@ class Nafaire:
         self.y += y * self.vitesseY
         self.rect = self.animation[0].get_rect(center=(self.x, self.y))
         
-        self.gérerCollisions()
+        self.detectCollisions()
 
-    def gérerCollisions(self):
-        
-        if(self.type == NafaireTypes.JOUEUR or self.type == NafaireTypes.ENNEMI):
-             ###corrige la position du joueur ou de l'ennemi pour qu'il ne sorte pas du cadre
-            if self.x < 0 : self.x = 0
-            if self.x > dimentions[0] : self.x = dimentions[0]
-            if self.y < 0 : self.y = 0
-            if self.y > dimentions[1] : self.y = dimentions[1]
+    def detectCollisions(self):
 
-            if(self.type == NafaireTypes.JOUEUR):
-                for enemi in enemies:
-                   if self.rect.colliderect(enemi.rect): 
-                       self.x, self.y = self.anciennePos
-                       self.rect = self.animation[0].get_rect(center=(self.x, self.y))
-                       pygame.event.post(pygame.event.Event(COLLISION_EVENT, source=self, collision=enemi))
-            else:#NafaireTypes.ENNEMI
-                if self.rect.colliderect(Joueur.rect): 
-                    self.x, self.y = self.anciennePos
-                    self.rect = self.animation[0].get_rect(center=(self.x, self.y))
-                    pygame.event.post(pygame.event.Event(COLLISION_EVENT, source=self, collision=Joueur))
+        if(self.x < 0 or self.x > dimentions[0] or self.y < 0 or self.y > dimentions[1]): 
+            pygame.event.post(pygame.event.Event(COLLISION_EVENT, source=self, collision=None))        
 
+        if(self.type == NafaireTypes.JOUEUR):
+            
+            for enemi in enemies:
+                if self.rect.colliderect(enemi.rect): 
+                    pygame.event.post(pygame.event.Event(COLLISION_EVENT, source=self, collision=enemi))
 
-        elif(self.type == NafaireTypes.BALLE or self.type == NafaireTypes.BALLE_ENNEMI):
-            ###détruit les balles hors champs
-            if(self.x < 0 or self.x > dimentions[0] or self.y < 0 or self.y > dimentions[1]): 
-                balleList.remove(self);
-                return
-            if(self.type == NafaireTypes.BALLE):
-                for enemi in enemies:
-                   if self.rect.colliderect(enemi.rect): 
-                       pygame.event.post(pygame.event.Event(COLLISION_EVENT, source=self, collision=enemi))
-                       break
-            else:#NafaireTypes.BALLE_ENNEMI
-                if self.rect.colliderect(Joueur.rect): pygame.event.post(pygame.event.Event(COLLISION_EVENT, source=self, collision=Joueur))
+        elif(self.type == NafaireTypes.ENNEMI and self.rect.colliderect(Joueur.rect)): 
+            pygame.event.post(pygame.event.Event(COLLISION_EVENT, source=self, collision=Joueur))
+
+        elif(self.type == NafaireTypes.BALLE):
+            
+            for enemi in enemies:
+                
+                if self.rect.colliderect(enemi.rect): 
+                    pygame.event.post(pygame.event.Event(COLLISION_EVENT, source=self, collision=enemi))
+                    break
+
+        elif(self.type == NafaireTypes.BALLE_ENNEMI and self.rect.colliderect(Joueur.rect)): 
+            pygame.event.post(pygame.event.Event(COLLISION_EVENT, source=self, collision=Joueur))
 
         
 
@@ -103,7 +93,7 @@ def Affichage():
 def tire():
     global peutTirer
     peutTirer = False
-    balle = Nafaire([Joueur.rect.centerx + 4, Joueur.rect.top + 22], balleImg, type=NafaireTypes.BALLE, vitesseY=0.06)
+    balle = Nafaire([Joueur.rect.centerx + 4, Joueur.rect.top - 22], balleImg, type=NafaireTypes.BALLE, vitesseY=8)
     balleList.append(balle)
 
     pygame.time.set_timer(DELAY_TIRE_EVENT, int(1000/tireParSecondes), True)
@@ -117,10 +107,10 @@ Fenêtre = pygame.display.set_mode(dimentions) # crée la fenêtre et enregiste 
 arrièrePlan = Nafaire([0,0], [pygame.image.load("background0.png")])
 arrièrePlan.animation[0] = pygame.transform.scale(arrièrePlan.animation[0], dimentions)
 
-Joueur = Nafaire([dimentions[0] / 2, dimentions[1] / 2], [pygame.image.load("quack0.png")], type=NafaireTypes.JOUEUR)
+Joueur = Nafaire([dimentions[0] / 2, dimentions[1] / 2], [pygame.image.load("quack0.png")], type=NafaireTypes.JOUEUR, vitesseX=0.0125, vitesseY=0.0125)
 
 enemies = list()
-enemies.append(Nafaire([dimentions[0] / 2, 5 ], [pygame.image.load("heart.png")], type=NafaireTypes.ENNEMI))   #cree un ennemi
+enemies.append(Nafaire([dimentions[0] / 2, 5 ], [pygame.image.load("heart.png")], type=NafaireTypes.ENNEMI, vitesseX=4, vitesseY=4))   #cree un ennemi
 
 balleImg = [pygame.image.load("balleJoueur.png")]
 balleList = list()
@@ -132,17 +122,13 @@ LEFT_CLICK = 1
 keysDown = None
 
 while leJeuTourne:
+
+    affiche = False
     ###gestion des evenements:
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:# Change la valeur à False pour terminer le while
             leJeuTourne = False
-
-        if event.type == AFFICHAGE_TIMER_EVENT:
-            Affichage()
-
-        if event.type == DELAY_TIRE_EVENT:
-            peutTirer = True
 
         if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
             keysDown = pygame.key.get_pressed()
@@ -151,44 +137,63 @@ while leJeuTourne:
             if (event.button == LEFT_CLICK and peutTirer == True): 
                 tire()
 
+        if event.type == AFFICHAGE_TIMER_EVENT:
+            affiche = True         
+
+        if event.type == DELAY_TIRE_EVENT:
+            peutTirer = True
+
         if event.type == COLLISION_EVENT:
-            if(event.source.type == NafaireTypes.BALLE):
-                enemies.remove(event.collision);
-            #if(event.source.type == NafaireTypes.JOUEUR and event.collision.type == NafaireTypes.ENNEMI):
-            #    Joueur.x, Joueur.y = Joueur.anciennePos
-            #    event.collision.x, event.collision.y = event.collision.anciennePos
 
-            #elif(event.source.type == NafaireTypes.ENNEMI and event.collision.type == NafaireTypes.JOUEUR):
-            #    event.collision.x, event.collision.y = event.collision.anciennePos
-            #    Joueur.x, Joueur.y = Joueur.anciennePos
-            #    print(event.collision.anciennePos)
+            if(event.collision == None):#collision avec la 'bordure du cadre'
+                
+                if(event.source.type == NafaireTypes.JOUEUR or event.source.type == NafaireTypes.ENNEMI):
+                    ###corrige la position du joueur ou de l'ennemi pour qu'il ne sorte pas du cadre
+                    if event.source.x < 0 : event.source.x = 0
+                    if event.source.x > dimentions[0] : event.source.x = dimentions[0]
+                    if event.source.y < 0 : event.source.y = 0
+                    if event.source.y > dimentions[1] : event.source.y = dimentions[1]
 
-
-
-
+                elif(event.source.type == NafaireTypes.BALLE):
+                    ###détruit les balles hors champs
+                    balleList.remove(event.source)              
+            
+            elif(event.source.type == NafaireTypes.BALLE and event.collision.type == NafaireTypes.ENNEMI):
+                enemies.remove(event.collision)
+                
+            elif(event.source.type == NafaireTypes.ENNEMI and event.collision.type == NafaireTypes.JOUEUR) or (event.source.type == NafaireTypes.JOUEUR and event.collision.type == NafaireTypes.ENNEMI):
+                event.source.x, event.source.y = event.source.anciennePos
+                event.source.rect = event.source.animation[0].get_rect(center=(event.source.x, event.source.y))
 
     #key_pressed: 
     if(keysDown != None):
+        x = 0
+        y = 0
         if keysDown[pygame.K_z]:             
-            Joueur.deplacement(0, -1)
+            y -= 1
         if keysDown[pygame.K_s]:
-            Joueur.deplacement(0, 1)
+            y += 1
         if keysDown[pygame.K_q]:
-            Joueur.deplacement(-1, 0)
+            x -= 1
         if keysDown[pygame.K_d]:                
-            Joueur.deplacement(1, 0)
+            x += 1
+        if(x != 0 or y != 0):
+            Joueur.deplacement(x, y)
+
         if (keysDown[pygame.K_SPACE] and peutTirer == True):
-            print(peutTirer)
             tire()
 
-    if(len(enemies) != 0): 
-        enemies[0].deplacement(0, 1)
+    if affiche:
 
-    for b in balleList:
-        b.deplacement(0, -1)
-    ###
+        affiche = False
 
+        if(len(enemies) != 0): 
+            enemies[0].deplacement(0, 1)
 
+        for b in balleList:
+            b.deplacement(0, -1)
+
+        Affichage()
 
 
 
