@@ -158,10 +158,11 @@ while leJeuTourne:
                     ###détruit les balles hors champs
                     balleList.remove(event.source)              
             
-            elif(event.source.type == NafaireTypes.BALLE and event.collision.type == NafaireTypes.ENNEMI):
+
+            elif(event.source.type == NafaireTypes.BALLE and event.collision.type == NafaireTypes.ENNEMI):#collision balle ennemi
                 enemies.remove(event.collision)
                 
-            elif(event.source.type == NafaireTypes.ENNEMI and event.collision.type == NafaireTypes.JOUEUR) or (event.source.type == NafaireTypes.JOUEUR and event.collision.type == NafaireTypes.ENNEMI):
+            elif(event.source.type == NafaireTypes.ENNEMI and event.collision.type == NafaireTypes.JOUEUR) or (event.source.type == NafaireTypes.JOUEUR and event.collision.type == NafaireTypes.ENNEMI):#collision joueur ennemi
                 event.source.x, event.source.y = event.source.anciennePos
                 event.source.rect = event.source.animation[0].get_rect(center=(event.source.x, event.source.y))
 
