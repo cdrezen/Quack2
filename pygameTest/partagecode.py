@@ -4,10 +4,10 @@ from enum import Enum
 leJeuTourne = True
 score = 0
 dimentions = (1024, 720)
-fps = 60
+fps = 30
 tireParSecondes = 4
 peutTirer = True
-delaiSpawn = 100
+delaiSpawn = 250
 
 AFFICHAGE_TIMER_EVENT = pygame.USEREVENT + 0
 COLLISION_EVENT = pygame.USEREVENT + 1
@@ -31,7 +31,7 @@ class NafaireTypes(Enum):
 
 #personnage joueur
 class Nafaire:
-    def __init__(self, position=(0,0), animation=None, vie=0, dmg=1, vitesseX=0.05, vitesseY=0.05, rect=None, type=NafaireTypes.DEFAULT):
+    def __init__(self, position=(0,0), animation=None, vie=0, dmg=1, vitesseX=0.1, vitesseY=0.1, rect=None, type=NafaireTypes.DEFAULT):
         self.x , self.y = position
         self.anciennePos = position
         self.animation = animation
@@ -126,6 +126,7 @@ enemies = list()
 enemies.append(Nafaire([dimentions[0] / 2, 5 ], [pygame.image.load("heart.png")], type=NafaireTypes.ENNEMI, vitesseX=4, vitesseY=4))   #cree un ennemi
 
 balleImg = [pygame.image.load("balleJoueur.png")]
+ennemiImg = [pygame.image.load("ennemi.png")]
 balleList = list()
 bonus = Nafaire(dmg=0, vitesseX=0)
 
@@ -157,7 +158,7 @@ def spawn_enemies():
         
     global change_dimx
         
-    enemies.append(Nafaire(( dimx[change_dimx] , dimy ), [pygame.image.load("ennemi.png")], type=NafaireTypes.ENNEMI))          #
+    enemies.append(Nafaire(( dimx[change_dimx] , dimy ), ennemiImg, type=NafaireTypes.ENNEMI))          #
             
     change_dimx += 1
     if change_dimx >= 20:
