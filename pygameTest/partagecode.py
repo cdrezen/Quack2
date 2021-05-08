@@ -3,7 +3,13 @@ from enum import Enum
 
 leJeuTourne = True
 score = 0
-dimentions = (1024, 720)
+
+class dim:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+dimentions = dim(1024, 720)
 fps = 30
 tireParSecondes = 4
 peutTirer = True
@@ -16,10 +22,6 @@ SPAWN_TIMER_EVENT = pygame.USEREVENT + 3
 
 Fenêtre = None
 
-class dim:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
 
 class NafaireTypes(Enum):
     DEFAULT = 0
@@ -27,7 +29,6 @@ class NafaireTypes(Enum):
     ENNEMI = 2
     BALLE = 3
     BALLE_ENNEMI = 4
-
 
 #personnage joueur
 class Nafaire:
@@ -55,7 +56,7 @@ class Nafaire:
 
     def detectCollisions(self):
 
-        if(self.x < 0 or self.x > dimentions[0] or self.y < 0 or self.y > dimentions[1]): 
+        if(self.x < 0 or self.x > dimentions.x or self.y < 0 or self.y > dimentions.y): 
             pygame.event.post(pygame.event.Event(COLLISION_EVENT, source=self, collision=None))        
 
         if(self.type == NafaireTypes.JOUEUR):
@@ -80,8 +81,10 @@ class Nafaire:
 
         
 class N2(Nafaire):
+
     def __init__(self, position=(...), animation=None, vie=0, dmg=1, vitesseX=0.05, vitesseY=0.05, rect=None, type=NafaireTypes.DEFAULT, dimX=0):
         self.dimX = dimX
+
 #affichage contiens ce qui doit etre affiché grace a pygame il es tutiliser a la fin du mainloop pour raffraichir l'affichage  
 def Affichage():
 
@@ -115,15 +118,15 @@ def tire():
 #DEBUT DU PROGRAMME
 pygame.init()   #initialisation de pygame
 pygame.display.set_caption("JEU BIEN")  #titre du jeu
-Fenêtre = pygame.display.set_mode(dimentions) # crée la fenêtre et enregiste sa variable
+Fenêtre = pygame.display.set_mode((dimentions.x, dimentions.y)) # crée la fenêtre et enregiste sa variable
 
 arrièrePlan = Nafaire([0,0], [pygame.image.load("background0.png")])
-arrièrePlan.animation[0] = pygame.transform.scale(arrièrePlan.animation[0], dimentions)
+arrièrePlan.animation[0] = pygame.transform.scale(arrièrePlan.animation[0], (dimentions.x, dimentions.y))
 
-Joueur = Nafaire([dimentions[0] / 2, dimentions[1] / 2], [pygame.image.load("quack0.png")], type=NafaireTypes.JOUEUR, vitesseX=5, vitesseY=5)
+Joueur = Nafaire([dimentions.x / 2, dimentions.y / 2], [pygame.image.load("quack0.png")], type=NafaireTypes.JOUEUR, vitesseX=5, vitesseY=5)
 
 enemies = list()
-enemies.append(Nafaire([dimentions[0] / 2, 5 ], [pygame.image.load("heart.png")], type=NafaireTypes.ENNEMI, vitesseX=4, vitesseY=4))   #cree un ennemi
+enemies.append(Nafaire([dimentions.x / 2, 5 ], [pygame.image.load("heart.png")], type=NafaireTypes.ENNEMI, vitesseX=4, vitesseY=4))   #cree un ennemi
 
 balleImg = [pygame.image.load("balleJoueur.png")]
 ennemiImg = [pygame.image.load("ennemi.png")]
@@ -194,9 +197,9 @@ while leJeuTourne:
                 if(event.source.type == NafaireTypes.JOUEUR or event.source.type == NafaireTypes.ENNEMI):
                     ###corrige la position du joueur ou de l'ennemi pour qu'il ne sorte pas du cadre
                     if event.source.x < 0 : event.source.x = 0
-                    if event.source.x > dimentions[0] : event.source.x = dimentions[0]
+                    if event.source.x > dimentions.x : event.source.x = dimentions.X
                     if event.source.y < 0 : event.source.y = 0
-                    if event.source.y > dimentions[1] : event.source.y = dimentions[1]
+                    if event.source.y > dimentions.y : event.source.y = dimentions.y
 
                 elif(event.source.type == NafaireTypes.BALLE):
                     ###détruit les balles hors champs
