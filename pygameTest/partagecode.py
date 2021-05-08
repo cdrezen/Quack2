@@ -2,15 +2,17 @@ import pygame
 from enum import Enum
 
 leJeuTourne = True
-Score = 0
+score = 0
 dimentions = (1024, 720)
 fps = 60
 tireParSecondes = 4
 peutTirer = True
+delaiSpawn = 1000
 
 AFFICHAGE_TIMER_EVENT = pygame.USEREVENT + 0
 COLLISION_EVENT = pygame.USEREVENT + 1
 DELAY_TIRE_EVENT = pygame.USEREVENT + 2
+SPAWN_TIMER_EVENT = pygame.USEREVENT + 3
 
 Fenêtre = None
 
@@ -72,13 +74,14 @@ class Nafaire:
             pygame.event.post(pygame.event.Event(COLLISION_EVENT, source=self, collision=Joueur))
 
         
-
-
+class N2(Nafaire):
+    def __init__(self, position=(...), animation=None, vie=0, dmg=1, vitesseX=0.05, vitesseY=0.05, rect=None, type=NafaireTypes.DEFAULT, dimX=0):
+        self.dimX = dimX
 #affichage contiens ce qui doit etre affiché grace a pygame il es tutiliser a la fin du mainloop pour raffraichir l'affichage  
 def Affichage():
 
-    Fenêtre.blit(arrièrePlan.animation[0], (arrièrePlan.x, arrièrePlan.y)) 
-
+    Fenêtre.blit(arrièrePlan.animation[0], (0,0))
+    
     Fenêtre.blit(Joueur.animation[0], Joueur.rect) #dessine le personnage à l'écran
 
     for enemi in enemies:
@@ -86,6 +89,11 @@ def Affichage():
 
     for b in balleList:
         Fenêtre.blit(b.animation[0], b.rect)
+    
+    img = score_im.render('{}'.format(str(score)), True , (255,255,255))
+    rect_score_img = score_img.get_rect()
+    Fenêtre.blit(score_img, (0,0))
+    Fenêtre.blit(img, rect_score_img.center)
 
     pygame.display.update()
  
@@ -115,8 +123,40 @@ enemies.append(Nafaire([dimentions[0] / 2, 5 ], [pygame.image.load("heart.png")]
 balleImg = [pygame.image.load("balleJoueur.png")]
 balleList = list()
 bonus = Nafaire(dmg=0, vitesseX=0)
-    
+
+#rajout score
+score_img = pygame.image.load("score_espace.jpg").convert() #c'est le cadre du score
+score_img = pygame.transform.smoothscale(score_img,(100,45))
+score_im = pygame.font.SysFont(None , 30)
+img = score_im.render('{}'.format(str(score)), True , (255,255,255))
+#rajout score
+
 pygame.time.set_timer(AFFICHAGE_TIMER_EVENT, int(1000/fps))
+pygame.time.set_timer(SPAWN_TIMER_EVENT, delaiSpawn)
+
+nn = N2(dimX = 1)###
+print(nn.dimX)###
+
+#rajout ennemi
+dimx = []
+dimy = 10
+for i in range(20):
+    dimx.append((int(i)*30))
+
+
+change_dimx = 0
+
+def spawn_enemies():
+        
+    global change_dimx
+        
+    enemies.append(Nafaire(( dimx[change_dimx] , dimy ), [pygame.image.load("ennemi.png")], type=NafaireTypes.ENNEMI))          #
+            
+    change_dimx += 1
+    if change_dimx >= 20:
+        change_dimx = 0
+        #print("1 sec est passée")
+#rajout
 
 LEFT_CLICK = 1
 keysDown = None
@@ -161,10 +201,16 @@ while leJeuTourne:
 
             elif(event.source.type == NafaireTypes.BALLE and event.collision.type == NafaireTypes.ENNEMI):#collision balle ennemi
                 enemies.remove(event.collision)
+                balleList.remove(event.source)
+                score += 1
                 
             elif(event.source.type == NafaireTypes.ENNEMI and event.collision.type == NafaireTypes.JOUEUR) or (event.source.type == NafaireTypes.JOUEUR and event.collision.type == NafaireTypes.ENNEMI):#collision joueur ennemi
                 event.source.x, event.source.y = event.source.anciennePos
                 event.source.rect = event.source.animation[0].get_rect(center=(event.source.x, event.source.y))
+
+        if event.type == SPAWN_TIMER_EVENT:
+            spawn_enemies()
+
 
     #key_pressed: 
     if(keysDown != None):
@@ -189,7 +235,8 @@ while leJeuTourne:
         affiche = False
 
         if(len(enemies) != 0): 
-            enemies[0].deplacement(0, 1)
+            for ennemi in enemies:
+                ennemi.deplacement(0, 1)
 
         for b in balleList:
             b.deplacement(0, -1)
