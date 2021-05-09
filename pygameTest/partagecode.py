@@ -1,9 +1,6 @@
 import pygame
 from enum import Enum
 
-leJeuTourne = True
-score = 0
-
 class dim:
     def __init__(self, x, y):
         self.x = x
@@ -14,12 +11,12 @@ fps = 30
 tireParSecondes = 8
 peutTirer = True
 delaiSpawn = 250
+score = 0
 
 AFFICHAGE_TIMER_EVENT = pygame.USEREVENT + 0
 COLLISION_EVENT = pygame.USEREVENT + 1
 DELAY_TIRE_EVENT = pygame.USEREVENT + 2
 SPAWN_TIMER_EVENT = pygame.USEREVENT + 3
-
 
 class NafaireTypes(Enum):
     DEFAULT = 0
@@ -28,7 +25,6 @@ class NafaireTypes(Enum):
     BALLE = 3
     BALLE_ENNEMI = 4
 
-#personnage joueur
 class Nafaire:
     def __init__(self, position=(0,0), animation=None, vie=0, dmg=1, vitesseX=0.1, vitesseY=0.1, rect=None, type=NafaireTypes.DEFAULT):
         self.x , self.y = position
@@ -129,11 +125,12 @@ def spawn_enemies():
 
 def main():
 
-    global leJeuTourne
+    leJeuTourne = True
+
     global peutTirer
     global score
-    global Joueur
     global Fenêtre
+    global Joueur
     global arrièrePlan
     global bonus
     global enemies
