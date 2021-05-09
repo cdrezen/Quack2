@@ -23,7 +23,6 @@ class NafaireTypes(Enum):
     JOUEUR = 1
     ENNEMI = 2
     BALLE = 3
-    BALLE_ENNEMI = 4
 
 class Nafaire:
     def __init__(self, position=(0,0), animation=None, vie=0, dmg=1, vitesseX=0.1, vitesseY=0.1, rect=None, type=NafaireTypes.DEFAULT):
@@ -69,9 +68,6 @@ class Nafaire:
                 if self.rect.colliderect(enemi.rect): 
                     pygame.event.post(pygame.event.Event(COLLISION_EVENT, source=self, collision=enemi))
                     break
-
-        elif(self.type == NafaireTypes.BALLE_ENNEMI and self.rect.colliderect(Joueur.rect)): 
-            pygame.event.post(pygame.event.Event(COLLISION_EVENT, source=self, collision=Joueur))
 
 
 #affichage contiens ce qui doit etre affiché grace a pygame il es tutiliser a la fin du mainloop pour raffraichir l'affichage  
