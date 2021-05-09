@@ -10,7 +10,7 @@ dimentions = dim(1024, 720)
 fps = 30
 tireParSecondes = 8
 peutTirer = True
-delaiSpawn = 250
+delaiSpawn = 500
 score = 0
 
 AFFICHAGE_TIMER_EVENT = pygame.USEREVENT + 0
@@ -39,6 +39,12 @@ class Nafaire:
         
         self.rect = self.animation[0].get_rect(center=(self.x, self.y))
 
+    """
+    .deplacement(x, y): déplace l'objet
+
+    :param x: taux de déplacement sur l'axe x
+    :param y: taux de déplacement sur l'axe y
+    """
     def deplacement(self, x, y):
         self.anciennePos = (self.x, self.y)
         self.x += x * self.vitesseX
@@ -69,8 +75,18 @@ class Nafaire:
                     pygame.event.post(pygame.event.Event(COLLISION_EVENT, source=self, collision=enemi))
                     break
 
-
-#affichage contiens ce qui doit etre affiché grace a pygame il es tutiliser a la fin du mainloop pour raffraichir l'affichage  
+class Zimage:
+    def init(self,image,scale=(0,0),centre=(0,0)):
+        self.image= pygame.image.load(str(image)).convert_alpha()
+        self.scale= pygame.transform.smoothscale(self.image, scale)
+        self.rect= self.scale.get_rect(center=centre)
+    
+    def affiche():
+       fenetre.blit(self.scale , self.surface )
+###
+# Affichage() dessine ce qui doit etre affiché grace a pygame. Il es utiliser à la fin du mainloop pour raffraichir la scène  
+# 
+###
 def Affichage():
 
     Fenêtre.blit(arrièrePlan.animation[0], (0,0))
@@ -90,11 +106,13 @@ def Affichage():
 
     pygame.display.update()
  
-
+"""
+tire() crée des balles pour qu'elles soient déplacées ensuite
+"""
 def tire():
     global peutTirer
     peutTirer = False
-    balle = Nafaire([Joueur.rect.centerx + 4, Joueur.rect.top - 22], balleImg, type=NafaireTypes.BALLE, vitesseY=8)
+    balle = Nafaire([Joueur.rect.centerx, Joueur.rect.top], balleImg, type=NafaireTypes.BALLE, vitesseY=8)
     balleList.append(balle)
 
     pygame.time.set_timer(DELAY_TIRE_EVENT, int(1000/tireParSecondes), True)
@@ -102,7 +120,7 @@ def tire():
 #rajout ennemi
 dimx = []
 dimy = 10
-for i in range(20):
+for i in range(34):
     dimx.append((int(i)*30))
 
 change_dimx = 0
@@ -114,11 +132,16 @@ def spawn_enemies():
     enemies.append(Nafaire(( dimx[change_dimx] , dimy ), ennemiImg, type=NafaireTypes.ENNEMI))
             
     change_dimx += 1
-    if change_dimx >= 20:
+    if change_dimx >= 34:
         change_dimx = 0
         #print("1 sec est passée")
 #rajout
 
+"""
+main(): C'est le point d'entré du programme. Il gère les évenements, les entrées utilisateurs et les déplacements
+
+:returns: 0 si tout c'est bien passé
+"""
 def main():
 
     leJeuTourne = True
@@ -144,15 +167,17 @@ def main():
     Fenêtre = pygame.display.set_mode((dimentions.x, dimentions.y)) # crée la fenêtre et enregiste sa variable
 
     arrièrePlan = Nafaire([0,0], [pygame.image.load("background0.png")])
-    arrièrePlan.animation[0] = pygame.transform.scale(arrièrePlan.animation[0], (dimentions.x, dimentions.y))
+    arrièrePlan.animation[0] = pygame.transform.smoothscale(arrièrePlan.animation[0], (dimentions.x, dimentions.y))
 
-    Joueur = Nafaire([dimentions.x / 2, dimentions.y / 2], [pygame.image.load("quack0.png")], type=NafaireTypes.JOUEUR, vitesseX=5, vitesseY=5)
+    JoueurImg  = [pygame.transform.smoothscale(pygame.image.load("joueur.png"),(125,108))]
+    Joueur = Nafaire([dimentions.x / 2, dimentions.y / 2], JoueurImg, type=NafaireTypes.JOUEUR, vitesseX=5, vitesseY=5)
+    
 
     enemies = list()
     enemies.append(Nafaire([dimentions.x / 2, 5 ], [pygame.image.load("heart.png")], type=NafaireTypes.ENNEMI, vitesseX=4, vitesseY=4))   #cree un ennemi
 
     balleImg = [pygame.image.load("balleJoueur.png")]
-    ennemiImg = [pygame.image.load("ennemi.png")]
+    ennemiImg = [pygame.image.load("quacklenvers.png")]
     balleList = list()
     bonus = Nafaire(dmg=0, vitesseX=0)
 
@@ -198,7 +223,7 @@ def main():
                     if(event.source.type == NafaireTypes.JOUEUR or event.source.type == NafaireTypes.ENNEMI):
                         ###corrige la position du joueur ou de l'ennemi pour qu'il ne sorte pas du cadre
                         if event.source.x < 0 : event.source.x = 0
-                        if event.source.x > dimentions.x : event.source.x = dimentions.X
+                        if event.source.x > dimentions.x : event.source.x = dimentions.x
                         if event.source.y < 0 : event.source.y = 0
                         if event.source.y > dimentions.y : event.source.y = dimentions.y
 
@@ -220,8 +245,6 @@ def main():
 
             elif event.type == SPAWN_TIMER_EVENT:
                 spawn_enemies()
-                print(len(enemies))
-
 
             elif event.type == AFFICHAGE_TIMER_EVENT:
             
