@@ -76,13 +76,13 @@ class Nafaire:
                     break
 
 class Zimage:
-    def init(self,image,scale=(0,0),centre=(0,0)):
+    def _init_(self,image,scale=(0,0),centre=(0,0)):
         self.image= pygame.image.load(str(image)).convert_alpha()
         self.scale= pygame.transform.smoothscale(self.image, scale)
         self.rect= self.scale.get_rect(center=centre)
     
-    def affiche():
-       fenetre.blit(self.scale , self.surface )
+    def affiche(self):
+       Fenêtre.blit(self.scale , self.surface )
 ###
 # Affichage() dessine ce qui doit etre affiché grace a pygame. Il es utiliser à la fin du mainloop pour raffraichir la scène  
 # 
